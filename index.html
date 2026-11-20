@@ -103,6 +103,15 @@ async function enableSenses(){
     src.connect(an); fbuf=new Uint8Array(an.frequencyBinCount);
   }
 }
+// giroscópio: no iPhone precisa de um toque; o primeiro toque em qualquer lugar libera (o microfone continua só no botão)
+let motionAsked=false;
+function askMotion(e){
+  if(!needsPerm||motionAsked||e.target.closest('.logo,#mic')) return;
+  motionAsked=true;
+  DeviceOrientationEvent.requestPermission().then(r=>{ if(r==='granted') listen(); else motionAsked=false; }).catch(()=>{ motionAsked=false; });
+}
+addEventListener('click',askMotion);
+addEventListener('touchend',askMotion);
 const micBtn=document.getElementById('mic');
 let micStream=null;
 function setMicUI(on){ micBtn.setAttribute('aria-pressed',on?'true':'false'); micBtn.setAttribute('aria-label',on?'Desligar microfone':'Ativar microfone'); }
