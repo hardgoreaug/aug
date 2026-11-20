@@ -92,6 +92,8 @@ const samp=(F,x,y)=>{
 const G=220, cell=(R-1)/(G-1), thr=cell*0.35;
 const S=2.4/R;                                // escala para o mundo 3D
 const DEPTH=0.95;                             // quanto "infla"
+const ALPHA=0.85, cA=Math.cos(ALPHA), sA=Math.sin(ALPHA); // direção real do rosto no logo
+const faceUV=(x,y,h)=>{ const u=(x-R/2)*cA+(h/S)*sA, v=y-R/2; return [(u+R)/(2*R), 1-(v+R/2)/R]; };
 const idxF=new Int32Array(G*G).fill(-1), idxB=new Int32Array(G*G).fill(-1);
 const pos=[],uv=[],col=[];
 const sd=new Float32Array(G*G);
@@ -102,8 +104,8 @@ for(let j=0;j<G;j++)for(let i=0;i<G;i++){
   if(isIn(k)){
     const h=DEPTH*Math.pow(Math.max(0,samp(P,x,y))/pmax,0.5);
     const X=(x-R/2)*S, Y=-(y-R/2)*S;
-    idxF[k]=pos.length/3; pos.push(X,Y,h); uv.push(x/R,1-y/R); col.push(1,1,1);
-    idxB[k]=pos.length/3; pos.push(X,Y,-h); uv.push(x/R,1-y/R); col.push(0,0,0);
+    idxF[k]=pos.length/3; pos.push(X,Y,h); uv.push(...faceUV(x,y,h)); col.push(1,1,1);
+    idxB[k]=pos.length/3; pos.push(X,Y,-h); uv.push(...faceUV(x,y,-h)); col.push(0,0,0);
   }else{
     let near=false;
     for(let dj=-1;dj<=1&&!near;dj++)for(let di=-1;di<=1;di++){
@@ -118,7 +120,7 @@ for(let j=0;j<G;j++)for(let i=0;i<G;i++){
       x-=gx/gl*s; y-=gy/gl*s;
     }
     const X=(x-R/2)*S, Y=-(y-R/2)*S;
-    idxF[k]=idxB[k]=pos.length/3; pos.push(X,Y,0); uv.push(x/R,1-y/R); col.push(1,1,1);
+    idxF[k]=idxB[k]=pos.length/3; pos.push(X,Y,0); uv.push(...faceUV(x,y,0)); col.push(1,1,1);
   }
 }
 const ind=[];
@@ -156,6 +158,38 @@ geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
 geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
 geo.setIndex(ind);
 geo.computeVertexNormals();
+// só pinta olho onde a superfície olha na direção do rosto (evita o olho "vazar" na lateral)
+{
+  const nrm=geo.attributes.normal.array, c=geo.attributes.color.array;
+  const dx=-sA, dz=cA;
+  for(let v=0;v<c.length/3;v++){
+    if(c[v*3]===0) continue;
+    const f=Math.max(0,Math.min(1,(0.8-nrm[v*3])/0.15)); // some só na lateral direita, onde o olho 'vazaria'
+    c[v*3]=c[v*3+1]=c[v*3+2]=f;
+  }
+}
+// orelha de trás: cresce até o tamanho real quando a cabeça vira e ela aparece
+const basePos=Float32Array.from(geo.attributes.position.array), earD=new Float32Array(basePos.length);
+{
+  const toLogo=(X,Y)=>[((X/S+R/2)-((R-VB.w*sc)/2))/sc+VB.x, ((-Y/S+R/2)-((R-VB.h*sc)/2))/sc+VB.y];
+  const toWorld=(lx,ly)=>[(((lx-VB.x)*sc+(R-VB.w*sc)/2)-R/2)*S, -(((ly-VB.y)*sc+(R-VB.h*sc)/2)-R/2)*S];
+  const AX=230, AY=345, SX=1.18, SY=1.5;
+  const sm=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+  for(let v=0;v<basePos.length/3;v++){
+    const [lx,ly]=toLogo(basePos[v*3],basePos[v*3+1]);
+    const w=sm((AY-ly)/90)*sm((400-lx)/80);
+    if(w<=0) continue;
+    const [wx,wy]=toWorld(AX+(lx-AX)*SX, AY+(ly-AY)*SY);
+    earD[v*3]=(wx-basePos[v*3])*w; earD[v*3+1]=(wy-basePos[v*3+1])*w; earD[v*3+2]=basePos[v*3+2]*0.45*w;
+  }
+}
+let lastEar=-1;
+function setEar(t){
+  if(Math.abs(t-lastEar)<0.005) return; lastEar=t;
+  const p=geo.attributes.position.array;
+  for(let i=0;i<p.length;i++) p[i]=basePos[i]+earD[i]*t;
+  geo.attributes.position.needsUpdate=true;
+}
 
 /* ---------- 3. cena ---------- */
 const canvas=document.getElementById('c');
@@ -174,24 +208,56 @@ const rig=new THREE.Group(); rig.rotation.order='YXZ'; scene.add(rig);
 const mat=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide,vertexColors:true}); // flat, sem luz
 const body=new THREE.Mesh(geo,mat); rig.add(body);
 
-// olhos pintados na superfície (textura projetada de frente) + piscada
+// olhos pintados na superfície, no espaço do rosto: os dois têm o mesmo tamanho real
 const T=1024, tc=document.createElement('canvas'); tc.width=tc.height=T;
 const tx2=tc.getContext('2d');
-const k=T/R, ox=(R-VB.w*sc)/2, oy=(R-VB.h*sc)/2;
 const eyeTex=new THREE.CanvasTexture(tc); eyeTex.colorSpace=THREE.SRGBColorSpace; eyeTex.generateMipmaps=false; eyeTex.minFilter=THREE.LinearFilter;
-function paintEyes(open){
+// contorno exato dos olhos do logo, levado para o espaço do rosto
+function eyePoly(d){
+  const NSs='http://www.w3.org/2000/svg', svg=document.createElementNS(NSs,'svg'), pe=document.createElementNS(NSs,'path');
+  pe.setAttribute('d',d); svg.style.cssText='position:absolute;width:0;height:0;visibility:hidden'; svg.appendChild(pe); document.body.appendChild(svg);
+  const L=pe.getTotalLength(), raw=[];
+  for(let i=0;i<240;i++){
+    const p=pe.getPointAtLength(L*i/240);
+    const rx=(p.x-VB.x)*sc+(R-VB.w*sc)/2, ry=(p.y-VB.y)*sc+(R-VB.h*sc)/2;
+    const h=DEPTH*Math.sqrt(Math.max(0,samp(P,rx,ry))/pmax);
+    raw.push([(rx-R/2)*cA+(h/S)*sA, ry-R/2]);
+  }
+  svg.remove();
+  let cu=0,cv=0; for(const q of raw){cu+=q[0];cv+=q[1];} cu/=raw.length; cv/=raw.length;
+  // reamostra por ângulo (mesmo nº de pontos nos dois olhos, para poder misturar)
+  const out=[];
+  for(let k=0;k<96;k++){
+    const th=k/96*Math.PI*2; let best=null,bd=1e9;
+    for(const q of raw){ let da=Math.abs(Math.atan2(q[1]-cv,q[0]-cu)-th+Math.PI*4)%(Math.PI*2); da=Math.min(da,Math.PI*2-da); if(da<bd){bd=da;best=q;} }
+    out.push([best[0]-cu,best[1]-cv]);
+  }
+  return {c:[cu,cv],p:out};
+}
+const NEAR=eyePoly("M497.5,751.1C434.2,735.6 405.3,643.9 433.1,547.1C451.2,484.0 484.0,446.2 522.3,444.3C569.5,441.9 607.2,487.6 619.7,562.0C623.5,585.1 621.9,624.4 616.0,649.5C603.0,704.7 573.5,742.2 535.9,751.4C527.0,753.6 506.9,753.4 497.5,751.1Z"), FAR=eyePoly("M162.2,729.4C128.0,712.4 119.1,617.5 144.9,545.2C164.5,490.4 196.4,479.0 216.5,519.6C242.3,571.7 232.0,682.1 197.7,720.5C187.9,731.6 173.7,735.1 162.2,729.4Z");
+const lerp=(a,b,t)=>a+(b-a)*t;
+let lastOpen=-1,lastT=-1;
+function paintEyes(open,t=lastT<0?0:lastT){
+  if(Math.abs(open-lastOpen)<0.01&&Math.abs(t-lastT)<0.01) return;
+  lastOpen=open; lastT=t;
   tx2.setTransform(1,0,0,1,0,0);
   tx2.fillStyle='#000'; tx2.fillRect(0,0,T,T);
-  tx2.setTransform(sc*k,0,0,sc*k,(-VB.x*sc+ox)*k,(-VB.y*sc+oy)*k);
   tx2.fillStyle='#f3f3f1';
-  for(const e of EYES){
-    const cx=(e.x0+e.x1)/2, by=e.y1, w=e.x1-e.x0, h=e.y1-e.y0;
-    if(open>0.12){
-      tx2.save(); tx2.translate(cx,by-h*0.35); tx2.scale(1,open); tx2.translate(-cx,-(by-h*0.35));
-      tx2.fill(new Path2D(e.d)); tx2.restore();
-    }else{
-      tx2.beginPath(); tx2.ellipse(cx,by-h*0.3,w*0.5,Math.max(10,h*0.04),0,0,Math.PI*2); tx2.fill();
-    }
+  // o olho de trás (menor no logo por estar de lado) ganha a forma do olho da frente quando aparece
+  const eyes=[
+    {c:NEAR.c,p:NEAR.p},
+    {c:[FAR.c[0],lerp(FAR.c[1],NEAR.c[1],t)],p:FAR.p.map((q,i)=>[lerp(q[0],NEAR.p[i][0],t),lerp(q[1],NEAR.p[i][1],t)])}
+  ];
+  for(const e of eyes){
+    let bot=-1e9; for(const q of e.p) bot=Math.max(bot,q[1]);
+    const o=open>0.12?open:0.06;
+    tx2.beginPath();
+    e.p.forEach((q,i)=>{
+      const U=e.c[0]+q[0], V=e.c[1]+bot-(bot-q[1])*o;
+      const X=(U+R)/(2*R)*T, Y=(V+R/2)/R*T;
+      i?tx2.lineTo(X,Y):tx2.moveTo(X,Y);
+    });
+    tx2.closePath(); tx2.fill();
   }
   eyeTex.needsUpdate=true;
 }
@@ -276,8 +342,12 @@ renderer.setAnimationLoop(()=>{
   const u=Math.max(-1,Math.min(1,ay/MAX));
   const yaw= u>=0 ? BASE_YAW+u*(YAW_LIM-BASE_YAW) : BASE_YAW+u*(YAW_LIM+BASE_YAW);
   rig.rotation.set(BASE_PITCH+ax*0.42,yaw,0);
+  setEar(Math.max(0,Math.min(1,yaw/0.6)));
   // piscada
-  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1){paintEyes(1);nextBlink=t+2.5+Math.random()*3.5;} else paintEyes(Math.max(0.05,Math.abs(1-2*p))); }
+  const turn=Math.max(0,Math.min(1,yaw/0.6));
+  let op=1;
+  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1){nextBlink=t+2.5+Math.random()*3.5;} else op=Math.max(0.05,Math.abs(1-2*p)); }
+  paintEyes(op,turn);
   rig.position.y=Math.sin(t*1.3)*.03;              // leve flutuação de balão
   shadow.scale.set(1-Math.abs(ay)*.25-rig.position.y*.5,1,1);
   
