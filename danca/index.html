@@ -34,16 +34,27 @@ const K={"L":{"head":[[-37.1,1000.0],[-44.8,1000.0],[-52.4,999.9],[-60.0,999.8],
 const path=document.getElementById('p');
 const lerp=(a,b,t)=>a+(b-a)*t;
 function mix(A,B,t){ return A.map((q,i)=>[lerp(q[0],B[i][0],t),lerp(q[1],B[i][1],t)]); }
-function shape(sv,pv,open,flick=0){
+function shape(sv,pv,open,flick=0,closed=0,wide=0){
   // sv: -1 esquerda … 0 frente … +1 direita;  pv: -1 olhando p/ cima … +1 p/ baixo
+  // closed: olhinhos fechados de carinho (^ ^);  wide: olhos arregalados de susto
   const B=sv<0?K.L:K.R, t=Math.abs(sv);
   let head=mix(K.F.head,B.head,t);
   let eyes=[0,1].map(i=>mix(K.F.eyes[i],B.eyes[i],t));
-  // inclinação vertical: olhos e orelhas se deslocam como numa cabeça girando p/ cima/baixo
   head=head.map(([x,y])=>{ const w=Math.max(0,(380-y)/380); return [x*(1+0.06*flick*w), y + pv*(-85*w + 35*(y>700?(y-700)/300:0)) - 70*flick*w*w]; });
   eyes=eyes.map(e=>{
-    let bot=-1e9; for(const q of e) bot=Math.max(bot,q[1]);
-    return e.map(([x,y])=>[x, bot-(bot-y)*open + pv*78]);
+    let bot=-1e9,top=1e9,l=1e9,r=-1e9;
+    for(const [x,y] of e){ bot=Math.max(bot,y); top=Math.min(top,y); l=Math.min(l,x); r=Math.max(r,x); }
+    const cx=(l+r)/2, cy=(top+bot)/2, hw=(r-l)/2, hh=(bot-top)/2;
+    return e.map(([x,y])=>{
+      let X=x, Y=bot-(bot-y)*open;
+      const g=1+0.32*wide; X=cx+(X-cx)*g; Y=cy+(Y-cy)*g;
+      if(closed>0){
+        const u=(x-cx)/hw, v=(y-cy)/hh;
+        const Xc=cx+(x-cx)*1.08, Yc=cy+hh*0.2-hh*0.38*(1-u*u)+v*hh*0.13;
+        X+=(Xc-X)*closed; Y+=(Yc-Y)*closed;
+      }
+      return [X, Y+pv*78];
+    });
   });
   const d=a=>'M'+a.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join('L')+'Z';
   return d(head)+d(eyes[0])+d(eyes[1]);
@@ -63,7 +74,7 @@ function onOrient(e){
   ty=clamp((g-base.g)/17,1.12); tx=clamp((b-base.b)/20,1.15);
 }
 function onPointer(e){
-  if(sensor||e.target===btn) return;
+  if(sensor||e.target===btn||pet>0.15) return;
   ty=clamp((e.clientX/innerWidth-.5)*2.6,1.12); tx=clamp((e.clientY/innerHeight-.5)*2.6,1.15);
   last=performance.now();
 }
@@ -145,13 +156,52 @@ setInterval(()=>{
   }
 },1000);
 
+/* ---------- carinho e susto ---------- */
+const catEl=document.getElementById('cat');
+function overCat(x,y){
+  const r=catEl.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height*0.56;
+  const dx=(x-cx)/(r.width*0.48), dy=(y-cy)/(r.height*0.46); return dx*dx+dy*dy<1;
+}
+let trail=[], petUntil=0, pet=0, down=null, scareAt=-1e9, scaredJump=false;
+addEventListener('pointermove',e=>{
+  const now=performance.now();
+  if(!overCat(e.clientX,e.clientY)||(e.pointerType!=='mouse'&&!e.buttons)){ trail=[]; return; }
+  trail.push({x:e.clientX,y:e.clientY,t:now});
+  while(trail.length&&now-trail[0].t>1000) trail.shift();
+  if(trail.length<8) return;
+  let cx=0,cy=0; for(const p of trail){cx+=p.x;cy+=p.y;} cx/=trail.length; cy/=trail.length;
+  let turn=0,len=0,rad=0,pa=null;
+  trail.forEach((p,i)=>{
+    const a=Math.atan2(p.y-cy,p.x-cx); rad+=Math.hypot(p.x-cx,p.y-cy);
+    if(pa!==null){ let d=a-pa; d=(d+3*Math.PI)%(2*Math.PI)-Math.PI; turn+=d; len+=Math.hypot(p.x-trail[i-1].x,p.y-trail[i-1].y); }
+    pa=a;
+  });
+  rad/=trail.length;
+  // girou pelo menos ~3/4 de volta, num círculo de tamanho razoável = carinho
+  if(Math.abs(turn)>Math.PI*1.5 && rad>10 && len>70) petUntil=now+600;
+});
+addEventListener('pointerdown',e=>{ if(overCat(e.clientX,e.clientY)) down={x:e.clientX,y:e.clientY,t:performance.now()}; });
+addEventListener('pointerup',e=>{
+  const now=performance.now();
+  if(down&&now-down.t<350&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<14&&overCat(e.clientX,e.clientY)){
+    scareAt=now; scaredJump=true; petUntil=0; pet=0;
+  }
+  down=null;
+});
+function scareAmt(now){ const s=(now-scareAt)/1000; if(s<0||s>1.7) return 0; if(s<0.08) return s/0.08; if(s<0.9) return 1; return 1-(s-0.9)/0.8; }
+
 let nextBlink=2, t0=performance.now(), prev=performance.now();
 function frame(now){
   const t=(now-t0)/1000, dt=Math.min(0.05,(now-prev)/1000); prev=now;
   // --- análise do som
   const beat=an?hear(now):0;
+  // --- carinho / susto
+  const petting=now<petUntil;
+  pet+=((petting?1:0)-pet)*Math.min(1,dt*(petting?2.6:0.8));
+  const sc=scareAmt(now), calm=1-Math.max(pet*0.85,sc);
+  if(scaredJump){ scaredJump=false; jumpV=Math.min(jumpV,-900); }
   // --- reação: pulo, amassadinho, orelhas, balanço alternado
-  const k=0.55+0.45*energy;
+  const k=(0.55+0.45*energy)*calm;
   if(beat){
     jumpV=Math.min(jumpV,-(520+380*energy)*beat);
     flick=Math.max(flick,beat); swayT=(beatN%2?1:-1)*k;
@@ -166,13 +216,19 @@ function frame(now){
   if(performance.now()-last>2500 && !an){ ix=Math.sin(t*.7)*.1; iy=Math.sin(t*.5)*.35; if(!sensor){tx*=.98;ty*=.98;} }
   ax+=(ix-ax)*.12; ay+=(iy-ay)*.12;
   let op=1;
-  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1) nextBlink=t+2.5+Math.random()*3.5; else op=Math.max(0.06,Math.abs(1-2*p)); }
-  const sv=clamp(ay+sway*0.38,1.12), pv=clamp(ax-flick*0.25,1.15);
-  path.setAttribute('d',shape(sv,pv,op,flick));
-  const sx=1+0.08*squash-0.03*flick, sy=1-0.11*squash+0.05*flick;
+  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1) nextBlink=t+2.5+Math.random()*3.5; else if(pet<0.3&&sc<0.05) op=Math.max(0.06,Math.abs(1-2*p)); }
+  const pe=pet*pet*(3-2*pet);
+  // susto: encara de frente; carinho: abaixa um pouco a cabeça e relaxa
+  const sv=clamp((ay+sway*0.38)*(1-sc)*(1-0.5*pe),1.12);
+  const pv=clamp((ax-flick*0.25)*(1-sc)*(1-0.6*pe)+0.22*pe-0.12*sc,1.15);
+  const ears=flick*calm-0.45*pe+0.9*sc;                       // orelhas: caem no carinho, empinam no susto
+  path.setAttribute('d',shape(sv,pv,op,ears,pe,sc));
+  const purr=pe>0.3?Math.sin(t*2*Math.PI*24)*1.6*pe:0;        // ronronar
+  const tremble=sc>0.5?Math.sin(t*2*Math.PI*17)*5*(sc-0.5):0;
+  const sx=1+0.08*squash-0.03*flick+0.035*pe-0.04*sc, sy=1-0.11*squash+0.05*flick-0.045*pe+0.06*sc;
   path.setAttribute('transform',
-    'translate('+(sv*28).toFixed(1)+','+(Math.sin(t*1.3)*6+ax*18+jumpY*0.32).toFixed(1)+') '+
-    'rotate('+(ay*3+sway*7).toFixed(2)+' 0 1000) '+
+    'translate('+(sv*28+tremble).toFixed(1)+','+(Math.sin(t*1.3)*6*(1-sc)+ax*18*(1-sc)+jumpY*0.32+purr).toFixed(1)+') '+
+    'rotate('+((ay*3+sway*7)*(1-sc)*(1-0.5*pe)).toFixed(2)+' 0 1000) '+
     'translate(0,1000) scale('+sx.toFixed(3)+','+sy.toFixed(3)+') translate(0,-1000)');
   requestAnimationFrame(frame);
 }
