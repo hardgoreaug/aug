@@ -30,7 +30,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const HEAD="M500,282 C590,280 650,286 700,276 C735,228 760,168 790,150 C820,135 845,160 850,200 C858,260 860,320 862,360 C905,420 922,500 917,585 C907,765 722,862 500,862 C278,862 93,765 83,585 C78,500 95,420 138,360 C140,320 142,260 150,200 C155,160 180,135 210,150 C240,168 265,228 300,276 C350,286 410,280 500,282 Z";
-const EYES=[{x:380,y:585,rx:58,ry:92},{x:620,y:585,rx:58,ry:92}];
+const EYES=[{x:358,y:590,rx:84,ry:130},{x:642,y:590,rx:84,ry:130}];
 const VB={x:40,y:100,w:920,h:800};          // área do desenho original
 
 /* ---------- 1. silhueta -> campo de distância + "pressão" (inflar) ---------- */
@@ -187,7 +187,7 @@ function paintEyes(open){
   for(const e of EYES){
     tx2.beginPath();
     if(open>0.12) tx2.ellipse(e.x,e.y+e.ry*(1-open)*0.6,e.rx,e.ry*open,0,0,Math.PI*2);
-    else { tx2.ellipse(e.x,e.y+e.ry*0.55,e.rx*1.05,9,0,0,Math.PI*2); }
+    else { tx2.ellipse(e.x,e.y+e.ry*0.55,e.rx*1.05,12,0,0,Math.PI*2); }
     tx2.fill();
   }
   eyeTex.needsUpdate=true;
