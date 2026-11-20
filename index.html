@@ -3,24 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AUG</title>
+<title>AUG dança</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;overflow:hidden;background:#f3f3f1;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
   body{font-family:system-ui,-apple-system,"Helvetica Neue",sans-serif;color:#0b0b0b;touch-action:none}
   #cat{position:fixed;left:50%;top:calc(42% + env(safe-area-inset-top)/2);transform:translate(-50%,-50%);width:min(80vw,440px);height:auto;overflow:visible}
-  .logo{position:fixed;left:50%;bottom:calc(16vh + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(46vw,230px);pointer-events:none}
+  .logo{position:fixed;left:50%;bottom:calc(16vh + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(46vw,230px);display:block;-webkit-tap-highlight-color:transparent}
   .logo svg{width:100%;height:auto;display:block}
-  #hint{position:fixed;left:50%;bottom:calc(9vh + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:13px;opacity:.45;white-space:nowrap;transition:opacity .6s}
-  #go{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);border:0;background:#0b0b0b;color:#fff;font:inherit;font-weight:700;font-size:15px;padding:14px 24px;border-radius:999px;cursor:pointer;white-space:nowrap}
-  #go[hidden]{display:none}
 </style>
 </head>
 <body>
 <svg id="cat" viewBox="-640 -90 1280 1180" aria-label="gato AUG"><path id="p" fill="#0b0b0b" fill-rule="evenodd"/></svg>
-<div class="logo"><svg viewBox="76 93 1096 352" aria-label="AUG"><path fill="#0b0b0b" fill-rule="evenodd" d="M653.2,437.8C670.4,436.1 694.1,430.4 705.9,425.2C711.6,422.6 721.0,417.9 722.1,417.0C722.7,416.5 724.2,415.6 725.4,415.0C728.7,413.4 738.0,407.0 741.3,404.2C746.1,400.1 757.0,389.9 757.0,389.5C757.0,389.3 758.6,387.5 760.6,385.4C762.6,383.4 765.3,380.1 766.6,378.2C767.9,376.3 770.0,373.5 771.2,372.0C772.5,370.6 774.1,368.2 774.8,366.8C775.6,365.4 777.1,362.6 778.3,360.5C779.5,358.4 781.5,354.0 782.9,350.7C784.3,347.4 786.4,342.7 787.7,340.3C788.9,337.9 790.1,335.1 790.3,334.1C790.4,333.1 791.3,329.1 792.3,325.2C798.4,299.9 798.1,307.0 797.5,214.8C797.2,170.5 796.8,137.5 796.5,135.7C795.6,130.0 790.7,119.9 787.6,117.6C786.7,116.9 784.5,115.1 782.8,113.7C767.4,101.0 744.7,101.7 728.4,115.4C723.6,119.4 723.6,119.5 720.5,125.7C715.6,135.8 716.1,122.7 715.0,253.8C714.8,279.3 714.5,300.9 714.3,301.8C710.6,316.7 706.8,325.1 700.4,332.1C690.9,342.6 686.9,345.8 673.0,353.7C662.8,359.4 647.8,362.7 632.0,362.6C618.7,362.6 614.0,361.8 600.8,357.6C595.2,355.9 584.1,350.7 582.1,349.0C581.2,348.2 579.6,347.0 578.5,346.5C576.5,345.5 568.2,337.5 562.9,331.5C558.1,325.9 551.0,311.1 549.4,303.2C549.0,301.1 548.8,277.0 548.5,219.2C548.1,131.0 548.3,136.1 545.3,129.4C533.0,101.5 496.7,96.4 476.3,119.7C466.9,130.4 467.5,123.5 467.5,217.9C467.5,297.1 467.6,303.1 469.5,319.2C470.7,329.5 471.1,331.0 473.6,336.6C474.7,339.0 476.0,342.2 476.5,343.6C479.7,352.5 481.0,355.6 482.8,358.2C483.8,359.9 486.1,363.6 487.8,366.5C489.5,369.4 491.7,372.6 492.7,373.8C493.7,374.9 495.4,377.0 496.4,378.5C498.3,381.4 507.4,392.5 508.0,392.5C508.2,392.5 510.3,394.4 512.8,396.6C515.2,398.9 518.0,401.3 519.0,402.0C520.0,402.7 521.9,404.2 523.2,405.3C524.6,406.5 526.9,408.2 528.4,409.1C529.8,410.0 533.2,412.3 535.9,414.1C564.2,433.2 608.8,442.2 653.2,437.8Z M132.8,436.6C134.4,436.1 136.5,435.5 137.3,435.3C139.5,434.8 146.7,430.4 149.8,427.6C151.1,426.4 152.9,424.8 153.8,424.0C154.6,423.3 156.6,420.5 158.1,418.0C159.7,415.4 161.7,412.2 162.6,411.0C163.5,409.8 164.9,407.0 165.8,404.8C167.9,399.9 175.7,385.4 176.9,384.4C178.5,383.0 179.8,383.0 271.2,383.0C376.6,383.0 363.7,382.1 367.3,389.9C368.5,392.4 370.3,395.6 371.3,396.9C372.2,398.1 373.4,400.4 373.8,402.0C374.8,405.2 376.7,409.2 379.8,414.3C384.3,421.8 385.6,423.5 388.1,425.6C389.5,426.8 391.6,428.6 392.7,429.5C400.2,436.1 415.6,439.7 427.2,437.6C438.1,435.5 449.7,427.1 454.5,417.6C462.9,401.4 461.2,390.3 446.5,363.8C445.4,361.8 444.2,359.1 443.7,357.8C443.3,356.4 441.7,353.2 440.2,350.8C438.7,348.3 436.2,343.2 434.6,339.5C433.0,335.8 430.9,331.4 430.1,329.8C429.2,328.1 427.7,324.8 426.6,322.4C425.5,320.0 423.9,317.1 423.1,315.9C422.3,314.7 420.9,311.9 420.0,309.7C418.3,305.2 416.7,302.0 413.3,296.2C412.0,293.9 410.7,291.2 410.3,290.1C409.4,287.7 406.1,281.1 403.8,277.3C402.8,275.7 401.4,272.8 400.7,270.8C399.9,268.9 398.3,265.4 397.1,263.2C395.9,261.1 394.3,257.7 393.7,255.8C393.1,254.0 391.9,251.3 391.1,249.8C390.3,248.4 388.6,245.3 387.3,243.0C385.9,240.7 384.6,238.0 384.2,237.0C383.6,235.2 381.1,230.3 377.5,223.5C376.4,221.4 374.8,218.1 374.0,216.0C373.3,213.9 371.6,210.7 370.4,208.8C368.4,205.6 366.2,201.1 363.1,193.9C362.5,192.6 361.4,190.5 360.5,189.2C359.6,188.0 358.3,185.5 357.6,183.8C357.0,182.1 355.2,178.3 353.7,175.3C352.2,172.3 349.9,167.5 348.7,164.5C347.4,161.6 345.3,157.4 344.0,155.2C342.7,153.1 341.2,150.1 340.6,148.7C339.6,145.9 337.5,142.6 334.3,138.8C333.2,137.4 331.6,135.2 330.8,134.0C329.1,131.4 320.5,122.8 315.9,119.1C299.4,106.0 273.5,101.2 251.2,107.0C245.5,108.5 237.7,111.5 235.5,113.0C234.8,113.4 232.8,114.6 231.0,115.6C229.2,116.6 226.8,118.3 225.6,119.3C224.4,120.3 222.5,121.8 221.5,122.5C219.0,124.1 212.9,131.2 209.8,136.0C208.4,138.1 206.6,140.6 205.6,141.7C204.7,142.8 202.7,146.3 201.2,149.5C199.6,152.7 197.3,157.2 195.9,159.6C194.6,161.9 192.8,165.6 192.0,167.6C191.3,169.7 189.5,173.4 188.1,175.8C186.7,178.2 183.0,185.5 180.0,192.0C173.7,205.2 171.9,208.9 170.2,211.6C168.9,213.7 167.0,217.8 165.4,221.8C164.9,223.2 163.6,225.8 162.5,227.5C160.1,231.2 157.3,236.5 156.0,240.2C155.4,241.7 153.8,244.7 152.4,246.8C151.0,249.0 149.5,251.9 149.0,253.3C148.5,254.7 146.9,258.4 145.3,261.5C143.8,264.7 141.6,269.4 140.5,272.0C139.3,274.6 137.9,277.4 137.3,278.2C135.9,280.1 133.6,284.6 131.5,289.6C130.6,291.8 128.6,295.6 127.1,298.1C125.6,300.7 123.6,304.6 122.7,306.9C121.8,309.2 120.1,312.7 118.9,314.6C117.7,316.6 115.9,319.9 114.9,322.0C113.9,324.1 111.6,328.8 109.8,332.5C108.0,336.2 106.2,340.1 105.8,341.2C105.4,342.4 104.1,345.1 102.8,347.2C99.8,352.3 97.1,357.9 95.9,361.4C95.4,362.9 93.9,365.9 92.6,367.9C91.2,370.0 89.3,373.7 88.3,376.0C87.2,378.3 85.3,382.6 84.0,385.5C79.0,396.4 79.1,403.1 84.5,414.3C89.0,423.6 90.4,425.3 98.9,431.6C101.4,433.4 108.4,436.4 112.2,437.3C116.7,438.3 128.7,437.9 132.8,436.6Z M1141.0,436.0C1147.2,433.9 1154.7,429.4 1157.1,426.4C1158.0,425.3 1159.8,423.2 1161.1,421.8C1163.5,419.0 1166.1,414.1 1167.1,410.2C1168.1,406.5 1168.0,266.9 1167.1,263.0C1165.7,257.6 1164.5,255.7 1156.9,246.3C1153.8,242.5 1145.7,237.8 1139.3,236.0L1133.5,234.5L1074.1,234.8C1009.2,235.1 1010.0,235.1 1003.6,238.0C995.3,241.9 986.1,253.7 983.8,263.6C982.7,268.3 982.8,277.4 984.0,282.2C986.6,292.4 994.9,302.7 1003.9,306.8C1011.1,310.1 1010.9,310.1 1046.0,310.5C1080.4,310.8 1078.3,310.6 1082.9,313.7C1087.2,316.5 1087.5,317.9 1087.5,335.0C1087.5,354.4 1087.2,355.4 1080.3,358.7L1076.6,360.5L1026.2,360.5C968.7,360.5 969.4,360.5 957.2,356.9C951.6,355.2 943.4,351.4 938.5,348.2C936.7,347.1 934.7,345.9 934.1,345.5C930.4,343.6 915.5,327.9 913.4,323.8C912.8,322.7 911.2,320.1 909.8,318.0C907.1,314.0 905.0,308.9 901.6,298.5C895.4,279.4 895.7,264.0 902.8,243.9C906.4,233.6 907.1,232.0 909.8,228.1C911.0,226.4 912.5,224.0 913.1,222.8C919.3,210.7 940.1,193.7 953.7,189.6C955.1,189.2 957.1,188.5 958.0,188.0C960.1,186.9 964.2,185.9 971.0,184.8C975.1,184.1 986.1,183.9 1048.8,183.5C1093.8,183.2 1123.1,182.8 1125.2,182.5C1132.9,181.4 1143.8,175.3 1147.9,169.9C1155.4,159.9 1157.0,155.8 1157.4,146.4C1157.8,135.3 1156.7,131.2 1151.1,123.0C1144.5,113.3 1137.0,108.2 1126.3,106.0C1120.1,104.7 974.2,105.0 960.8,106.3C945.6,107.8 936.1,110.0 919.2,116.2C911.8,119.0 899.8,125.1 893.4,129.5C882.3,136.9 880.9,137.9 879.4,139.3C878.5,140.1 876.5,141.7 875.0,142.9C872.5,144.8 864.1,152.9 857.5,159.8C853.7,163.7 845.7,174.8 843.6,178.8C843.0,179.9 841.6,182.0 840.4,183.5C839.1,185.0 836.8,189.1 835.3,192.5C833.7,195.9 832.0,199.3 831.4,200.1C830.2,201.8 827.0,208.5 827.0,209.3C827.0,209.7 825.2,215.0 823.0,221.2C818.3,234.2 818.0,235.6 816.2,250.5C813.1,275.8 815.2,306.1 821.2,321.8C822.4,324.8 824.4,330.5 825.8,334.5C827.2,338.9 829.2,343.7 830.9,346.8C832.4,349.5 834.7,353.8 835.9,356.4C837.1,358.9 839.0,362.2 840.2,363.6C841.4,365.1 842.8,367.0 843.2,368.0C845.9,373.3 863.8,395.0 865.4,395.0C865.6,395.0 867.0,396.2 868.5,397.7C870.0,399.1 873.1,401.7 875.4,403.4C877.6,405.2 879.6,406.8 879.8,407.0C881.0,409.1 904.6,423.0 909.3,424.5C910.4,424.8 912.0,425.5 912.9,426.1C917.5,428.7 933.9,433.5 944.0,435.2C948.3,435.9 952.5,436.6 953.5,436.8C955.2,437.1 1065.9,437.8 1111.8,437.8C1135.8,437.7 1135.8,437.7 1141.0,436.0Z M216.2,325.5C208.9,324.9 207.7,322.1 211.1,313.5C212.0,311.4 213.0,309.2 213.6,308.4C214.6,307.0 217.0,301.8 218.5,297.8C219.0,296.5 220.3,293.9 221.4,292.1C222.5,290.3 224.9,285.6 226.7,281.6C228.5,277.7 230.7,273.5 231.7,272.3C232.6,271.0 234.2,267.9 235.2,265.4C236.2,262.8 237.8,259.4 238.8,257.8C240.9,254.1 247.6,240.5 251.1,232.5C253.5,227.1 255.6,223.0 258.1,218.9C259.4,216.7 260.9,213.5 261.5,211.7C264.2,203.5 269.7,200.7 274.9,204.8C276.9,206.4 284.3,220.2 287.5,228.2C288.4,230.4 290.0,233.6 291.1,235.1C292.2,236.7 294.4,241.1 296.1,244.9C297.7,248.7 300.1,253.1 301.2,254.8C302.4,256.4 303.8,259.0 304.4,260.6C305.5,263.5 307.3,267.1 311.2,274.0C312.4,276.1 313.6,278.6 314.0,279.5C314.3,280.5 316.0,283.9 317.6,287.1C319.2,290.3 320.9,294.0 321.5,295.4C322.3,297.5 323.3,299.4 328.4,308.6C332.4,315.6 333.4,321.6 331.1,324.0C329.7,325.3 329.7,325.3 319.8,325.7C307.8,326.1 221.2,326.0 216.2,325.5Z"/></svg></div>
-<div id="hint">mexa o celular</div>
-<button id="go" hidden>Ativar movimento</button>
+<a class="logo" href="https://aaaug.bandcamp.com/" aria-label="AUG no Bandcamp"><svg viewBox="76 93 1096 352" aria-label="AUG"><path fill="#0b0b0b" fill-rule="evenodd" d="M653.2,437.8C670.4,436.1 694.1,430.4 705.9,425.2C711.6,422.6 721.0,417.9 722.1,417.0C722.7,416.5 724.2,415.6 725.4,415.0C728.7,413.4 738.0,407.0 741.3,404.2C746.1,400.1 757.0,389.9 757.0,389.5C757.0,389.3 758.6,387.5 760.6,385.4C762.6,383.4 765.3,380.1 766.6,378.2C767.9,376.3 770.0,373.5 771.2,372.0C772.5,370.6 774.1,368.2 774.8,366.8C775.6,365.4 777.1,362.6 778.3,360.5C779.5,358.4 781.5,354.0 782.9,350.7C784.3,347.4 786.4,342.7 787.7,340.3C788.9,337.9 790.1,335.1 790.3,334.1C790.4,333.1 791.3,329.1 792.3,325.2C798.4,299.9 798.1,307.0 797.5,214.8C797.2,170.5 796.8,137.5 796.5,135.7C795.6,130.0 790.7,119.9 787.6,117.6C786.7,116.9 784.5,115.1 782.8,113.7C767.4,101.0 744.7,101.7 728.4,115.4C723.6,119.4 723.6,119.5 720.5,125.7C715.6,135.8 716.1,122.7 715.0,253.8C714.8,279.3 714.5,300.9 714.3,301.8C710.6,316.7 706.8,325.1 700.4,332.1C690.9,342.6 686.9,345.8 673.0,353.7C662.8,359.4 647.8,362.7 632.0,362.6C618.7,362.6 614.0,361.8 600.8,357.6C595.2,355.9 584.1,350.7 582.1,349.0C581.2,348.2 579.6,347.0 578.5,346.5C576.5,345.5 568.2,337.5 562.9,331.5C558.1,325.9 551.0,311.1 549.4,303.2C549.0,301.1 548.8,277.0 548.5,219.2C548.1,131.0 548.3,136.1 545.3,129.4C533.0,101.5 496.7,96.4 476.3,119.7C466.9,130.4 467.5,123.5 467.5,217.9C467.5,297.1 467.6,303.1 469.5,319.2C470.7,329.5 471.1,331.0 473.6,336.6C474.7,339.0 476.0,342.2 476.5,343.6C479.7,352.5 481.0,355.6 482.8,358.2C483.8,359.9 486.1,363.6 487.8,366.5C489.5,369.4 491.7,372.6 492.7,373.8C493.7,374.9 495.4,377.0 496.4,378.5C498.3,381.4 507.4,392.5 508.0,392.5C508.2,392.5 510.3,394.4 512.8,396.6C515.2,398.9 518.0,401.3 519.0,402.0C520.0,402.7 521.9,404.2 523.2,405.3C524.6,406.5 526.9,408.2 528.4,409.1C529.8,410.0 533.2,412.3 535.9,414.1C564.2,433.2 608.8,442.2 653.2,437.8Z M132.8,436.6C134.4,436.1 136.5,435.5 137.3,435.3C139.5,434.8 146.7,430.4 149.8,427.6C151.1,426.4 152.9,424.8 153.8,424.0C154.6,423.3 156.6,420.5 158.1,418.0C159.7,415.4 161.7,412.2 162.6,411.0C163.5,409.8 164.9,407.0 165.8,404.8C167.9,399.9 175.7,385.4 176.9,384.4C178.5,383.0 179.8,383.0 271.2,383.0C376.6,383.0 363.7,382.1 367.3,389.9C368.5,392.4 370.3,395.6 371.3,396.9C372.2,398.1 373.4,400.4 373.8,402.0C374.8,405.2 376.7,409.2 379.8,414.3C384.3,421.8 385.6,423.5 388.1,425.6C389.5,426.8 391.6,428.6 392.7,429.5C400.2,436.1 415.6,439.7 427.2,437.6C438.1,435.5 449.7,427.1 454.5,417.6C462.9,401.4 461.2,390.3 446.5,363.8C445.4,361.8 444.2,359.1 443.7,357.8C443.3,356.4 441.7,353.2 440.2,350.8C438.7,348.3 436.2,343.2 434.6,339.5C433.0,335.8 430.9,331.4 430.1,329.8C429.2,328.1 427.7,324.8 426.6,322.4C425.5,320.0 423.9,317.1 423.1,315.9C422.3,314.7 420.9,311.9 420.0,309.7C418.3,305.2 416.7,302.0 413.3,296.2C412.0,293.9 410.7,291.2 410.3,290.1C409.4,287.7 406.1,281.1 403.8,277.3C402.8,275.7 401.4,272.8 400.7,270.8C399.9,268.9 398.3,265.4 397.1,263.2C395.9,261.1 394.3,257.7 393.7,255.8C393.1,254.0 391.9,251.3 391.1,249.8C390.3,248.4 388.6,245.3 387.3,243.0C385.9,240.7 384.6,238.0 384.2,237.0C383.6,235.2 381.1,230.3 377.5,223.5C376.4,221.4 374.8,218.1 374.0,216.0C373.3,213.9 371.6,210.7 370.4,208.8C368.4,205.6 366.2,201.1 363.1,193.9C362.5,192.6 361.4,190.5 360.5,189.2C359.6,188.0 358.3,185.5 357.6,183.8C357.0,182.1 355.2,178.3 353.7,175.3C352.2,172.3 349.9,167.5 348.7,164.5C347.4,161.6 345.3,157.4 344.0,155.2C342.7,153.1 341.2,150.1 340.6,148.7C339.6,145.9 337.5,142.6 334.3,138.8C333.2,137.4 331.6,135.2 330.8,134.0C329.1,131.4 320.5,122.8 315.9,119.1C299.4,106.0 273.5,101.2 251.2,107.0C245.5,108.5 237.7,111.5 235.5,113.0C234.8,113.4 232.8,114.6 231.0,115.6C229.2,116.6 226.8,118.3 225.6,119.3C224.4,120.3 222.5,121.8 221.5,122.5C219.0,124.1 212.9,131.2 209.8,136.0C208.4,138.1 206.6,140.6 205.6,141.7C204.7,142.8 202.7,146.3 201.2,149.5C199.6,152.7 197.3,157.2 195.9,159.6C194.6,161.9 192.8,165.6 192.0,167.6C191.3,169.7 189.5,173.4 188.1,175.8C186.7,178.2 183.0,185.5 180.0,192.0C173.7,205.2 171.9,208.9 170.2,211.6C168.9,213.7 167.0,217.8 165.4,221.8C164.9,223.2 163.6,225.8 162.5,227.5C160.1,231.2 157.3,236.5 156.0,240.2C155.4,241.7 153.8,244.7 152.4,246.8C151.0,249.0 149.5,251.9 149.0,253.3C148.5,254.7 146.9,258.4 145.3,261.5C143.8,264.7 141.6,269.4 140.5,272.0C139.3,274.6 137.9,277.4 137.3,278.2C135.9,280.1 133.6,284.6 131.5,289.6C130.6,291.8 128.6,295.6 127.1,298.1C125.6,300.7 123.6,304.6 122.7,306.9C121.8,309.2 120.1,312.7 118.9,314.6C117.7,316.6 115.9,319.9 114.9,322.0C113.9,324.1 111.6,328.8 109.8,332.5C108.0,336.2 106.2,340.1 105.8,341.2C105.4,342.4 104.1,345.1 102.8,347.2C99.8,352.3 97.1,357.9 95.9,361.4C95.4,362.9 93.9,365.9 92.6,367.9C91.2,370.0 89.3,373.7 88.3,376.0C87.2,378.3 85.3,382.6 84.0,385.5C79.0,396.4 79.1,403.1 84.5,414.3C89.0,423.6 90.4,425.3 98.9,431.6C101.4,433.4 108.4,436.4 112.2,437.3C116.7,438.3 128.7,437.9 132.8,436.6Z M1141.0,436.0C1147.2,433.9 1154.7,429.4 1157.1,426.4C1158.0,425.3 1159.8,423.2 1161.1,421.8C1163.5,419.0 1166.1,414.1 1167.1,410.2C1168.1,406.5 1168.0,266.9 1167.1,263.0C1165.7,257.6 1164.5,255.7 1156.9,246.3C1153.8,242.5 1145.7,237.8 1139.3,236.0L1133.5,234.5L1074.1,234.8C1009.2,235.1 1010.0,235.1 1003.6,238.0C995.3,241.9 986.1,253.7 983.8,263.6C982.7,268.3 982.8,277.4 984.0,282.2C986.6,292.4 994.9,302.7 1003.9,306.8C1011.1,310.1 1010.9,310.1 1046.0,310.5C1080.4,310.8 1078.3,310.6 1082.9,313.7C1087.2,316.5 1087.5,317.9 1087.5,335.0C1087.5,354.4 1087.2,355.4 1080.3,358.7L1076.6,360.5L1026.2,360.5C968.7,360.5 969.4,360.5 957.2,356.9C951.6,355.2 943.4,351.4 938.5,348.2C936.7,347.1 934.7,345.9 934.1,345.5C930.4,343.6 915.5,327.9 913.4,323.8C912.8,322.7 911.2,320.1 909.8,318.0C907.1,314.0 905.0,308.9 901.6,298.5C895.4,279.4 895.7,264.0 902.8,243.9C906.4,233.6 907.1,232.0 909.8,228.1C911.0,226.4 912.5,224.0 913.1,222.8C919.3,210.7 940.1,193.7 953.7,189.6C955.1,189.2 957.1,188.5 958.0,188.0C960.1,186.9 964.2,185.9 971.0,184.8C975.1,184.1 986.1,183.9 1048.8,183.5C1093.8,183.2 1123.1,182.8 1125.2,182.5C1132.9,181.4 1143.8,175.3 1147.9,169.9C1155.4,159.9 1157.0,155.8 1157.4,146.4C1157.8,135.3 1156.7,131.2 1151.1,123.0C1144.5,113.3 1137.0,108.2 1126.3,106.0C1120.1,104.7 974.2,105.0 960.8,106.3C945.6,107.8 936.1,110.0 919.2,116.2C911.8,119.0 899.8,125.1 893.4,129.5C882.3,136.9 880.9,137.9 879.4,139.3C878.5,140.1 876.5,141.7 875.0,142.9C872.5,144.8 864.1,152.9 857.5,159.8C853.7,163.7 845.7,174.8 843.6,178.8C843.0,179.9 841.6,182.0 840.4,183.5C839.1,185.0 836.8,189.1 835.3,192.5C833.7,195.9 832.0,199.3 831.4,200.1C830.2,201.8 827.0,208.5 827.0,209.3C827.0,209.7 825.2,215.0 823.0,221.2C818.3,234.2 818.0,235.6 816.2,250.5C813.1,275.8 815.2,306.1 821.2,321.8C822.4,324.8 824.4,330.5 825.8,334.5C827.2,338.9 829.2,343.7 830.9,346.8C832.4,349.5 834.7,353.8 835.9,356.4C837.1,358.9 839.0,362.2 840.2,363.6C841.4,365.1 842.8,367.0 843.2,368.0C845.9,373.3 863.8,395.0 865.4,395.0C865.6,395.0 867.0,396.2 868.5,397.7C870.0,399.1 873.1,401.7 875.4,403.4C877.6,405.2 879.6,406.8 879.8,407.0C881.0,409.1 904.6,423.0 909.3,424.5C910.4,424.8 912.0,425.5 912.9,426.1C917.5,428.7 933.9,433.5 944.0,435.2C948.3,435.9 952.5,436.6 953.5,436.8C955.2,437.1 1065.9,437.8 1111.8,437.8C1135.8,437.7 1135.8,437.7 1141.0,436.0Z M216.2,325.5C208.9,324.9 207.7,322.1 211.1,313.5C212.0,311.4 213.0,309.2 213.6,308.4C214.6,307.0 217.0,301.8 218.5,297.8C219.0,296.5 220.3,293.9 221.4,292.1C222.5,290.3 224.9,285.6 226.7,281.6C228.5,277.7 230.7,273.5 231.7,272.3C232.6,271.0 234.2,267.9 235.2,265.4C236.2,262.8 237.8,259.4 238.8,257.8C240.9,254.1 247.6,240.5 251.1,232.5C253.5,227.1 255.6,223.0 258.1,218.9C259.4,216.7 260.9,213.5 261.5,211.7C264.2,203.5 269.7,200.7 274.9,204.8C276.9,206.4 284.3,220.2 287.5,228.2C288.4,230.4 290.0,233.6 291.1,235.1C292.2,236.7 294.4,241.1 296.1,244.9C297.7,248.7 300.1,253.1 301.2,254.8C302.4,256.4 303.8,259.0 304.4,260.6C305.5,263.5 307.3,267.1 311.2,274.0C312.4,276.1 313.6,278.6 314.0,279.5C314.3,280.5 316.0,283.9 317.6,287.1C319.2,290.3 320.9,294.0 321.5,295.4C322.3,297.5 323.3,299.4 328.4,308.6C332.4,315.6 333.4,321.6 331.1,324.0C329.7,325.3 329.7,325.3 319.8,325.7C307.8,326.1 221.2,326.0 216.2,325.5Z"/></svg></a>
 <script>
 {
 /* três desenhos-chave com os mesmos pontos correspondentes:
@@ -29,16 +24,27 @@ const K={"L":{"head":[[-37.1,1000.0],[-44.8,1000.0],[-52.4,999.9],[-60.0,999.8],
 const path=document.getElementById('p');
 const lerp=(a,b,t)=>a+(b-a)*t;
 function mix(A,B,t){ return A.map((q,i)=>[lerp(q[0],B[i][0],t),lerp(q[1],B[i][1],t)]); }
-function shape(sv,pv,open){
+function shape(sv,pv,open,flick=0,closed=0,wide=0){
   // sv: -1 esquerda … 0 frente … +1 direita;  pv: -1 olhando p/ cima … +1 p/ baixo
+  // closed: olhinhos fechados de carinho (^ ^);  wide: olhos arregalados de susto
   const B=sv<0?K.L:K.R, t=Math.abs(sv);
   let head=mix(K.F.head,B.head,t);
   let eyes=[0,1].map(i=>mix(K.F.eyes[i],B.eyes[i],t));
-  // inclinação vertical: olhos e orelhas se deslocam como numa cabeça girando p/ cima/baixo
-  head=head.map(([x,y])=>{ const w=Math.max(0,(380-y)/380); return [x, y + pv*(-85*w + 35*(y>700?(y-700)/300:0))]; });
+  head=head.map(([x,y])=>{ const w=Math.max(0,(380-y)/380); return [x*(1+0.06*flick*w), y + pv*(-85*w + 35*(y>700?(y-700)/300:0)) - 70*flick*w*w]; });
   eyes=eyes.map(e=>{
-    let bot=-1e9; for(const q of e) bot=Math.max(bot,q[1]);
-    return e.map(([x,y])=>[x, bot-(bot-y)*open + pv*78]);
+    let bot=-1e9,top=1e9,l=1e9,r=-1e9;
+    for(const [x,y] of e){ bot=Math.max(bot,y); top=Math.min(top,y); l=Math.min(l,x); r=Math.max(r,x); }
+    const cx=(l+r)/2, cy=(top+bot)/2, hw=(r-l)/2, hh=(bot-top)/2;
+    return e.map(([x,y])=>{
+      let X=x, Y=bot-(bot-y)*open;
+      const g=1+0.32*wide; X=cx+(X-cx)*g; Y=cy+(Y-cy)*g;
+      if(closed>0){
+        const u=(x-cx)/hw, v=(y-cy)/hh;
+        const Xc=cx+(x-cx)*1.08, Yc=cy+hh*0.2-hh*0.38*(1-u*u)+v*hh*0.13;
+        X+=(Xc-X)*closed; Y+=(Yc-Y)*closed;
+      }
+      return [X, Y+pv*78];
+    });
   });
   const d=a=>'M'+a.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join('L')+'Z';
   return d(head)+d(eyes[0])+d(eyes[1]);
@@ -46,11 +52,10 @@ function shape(sv,pv,open){
 
 let tx=0,ty=0,ax=0,ay=0,base=null,sensor=false,last=0;
 const clamp=(v,a)=>Math.max(-a,Math.min(a,v));
-const hint=document.getElementById('hint'), btn=document.getElementById('go');
+
 function onOrient(e){
   if(e.beta==null||e.gamma==null) return;
-  if(!sensor){sensor=true; hint.style.opacity=0;}
-  last=performance.now();
+  sensor=true; last=performance.now();
   let b=e.beta,g=e.gamma;
   const ang=(screen.orientation&&screen.orientation.angle)||window.orientation||0;
   if(ang==90){[b,g]=[-g,b]} else if(ang==-90||ang==270){[b,g]=[g,-b]}
@@ -59,35 +64,161 @@ function onOrient(e){
   ty=clamp((g-base.g)/17,1.12); tx=clamp((b-base.b)/20,1.15);
 }
 function onPointer(e){
-  if(sensor) return;
+  if(sensor||pet>0.15) return;
   ty=clamp((e.clientX/innerWidth-.5)*2.6,1.12); tx=clamp((e.clientY/innerHeight-.5)*2.6,1.15);
   last=performance.now();
 }
 addEventListener('pointermove',onPointer); addEventListener('pointerdown',onPointer);
-function listen(){ addEventListener('deviceorientation',onOrient,true); }
+let listening=false;
+function listen(){ if(!listening){ listening=true; addEventListener('deviceorientation',onOrient,true); } }
 const needsPerm=typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
-if(!window.isSecureContext){ hint.textContent='abra pelo link https para usar o giroscópio'; }
-else if(needsPerm){
-  btn.hidden=false; hint.style.opacity=0;
-  btn.addEventListener('click',async()=>{
-    try{ const r=await DeviceOrientationEvent.requestPermission();
-      if(r==='granted'){listen(); btn.hidden=true;}
-      else {btn.textContent='Permissão negada: arraste o dedo'; setTimeout(()=>btn.hidden=true,2500);} }
-    catch(err){btn.textContent='Arraste o dedo na tela'; setTimeout(()=>btn.hidden=true,2500);}
-  });
-} else listen();
+if(!needsPerm) listen();
 
-let nextBlink=2, t0=performance.now();
+/* ---------- ouvido: microfone -> graves -> batidas (tudo processado só no aparelho) ---------- */
+let actx=null, an=null, fbuf=null;
+// sem botão: o primeiro toque na tela libera microfone e giroscópio
+let asked=false;
+async function enableSenses(){
+  if(asked) return; asked=true;
+  if(!window.isSecureContext||!navigator.mediaDevices) return;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!actx) actx=new AC(); actx.resume&&actx.resume();
+  const pOri=needsPerm?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):Promise.resolve('granted');
+  const pMic=navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).catch(()=>null);
+  const [ori,stream]=await Promise.all([pOri,pMic]);
+  if(ori==='granted') listen();
+  if(stream){
+    micTrack=stream.getAudioTracks()[0];
+    const src=actx.createMediaStreamSource(stream);
+    an=actx.createAnalyser(); an.fftSize=2048; an.smoothingTimeConstant=0.35;
+    src.connect(an); fbuf=new Uint8Array(an.frequencyBinCount);
+  }
+}
+addEventListener('click',e=>{ if(!e.target.closest('.logo')) enableSenses(); });
+addEventListener('touchend',e=>{ if(!e.target.closest('.logo')) enableSenses(); });
+
+let prevSpec=null, fluxHist=[], lastBeat=0, beatN=0, ibis=[], lvl=0, lvlMax=0.05, energy=0;
+let sway=0, swayT=0, jumpY=0, jumpV=0, squash=0, flick=0;
+const median=a=>{const b=[...a].sort((x,y)=>x-y);return b[b.length>>1];};
+function hear(now){
+  an.getByteFrequencyData(fbuf);
+  const hz=actx.sampleRate/an.fftSize, i0=Math.max(1,Math.floor(35/hz)), i1=Math.ceil(180/hz), i2=Math.ceil(5000/hz);
+  // fluxo: quanto o grave SUBIU desde o quadro anterior (pega o ataque do bumbo mesmo com grave constante)
+  let flux=0, all=0;
+  if(!prevSpec) prevSpec=new Float32Array(fbuf.length);
+  for(let i=i0;i<=i2;i++){
+    const v=fbuf[i]/255; all+=v;
+    if(i<=i1){ const d=v-prevSpec[i]; if(d>0) flux+=d; }
+    prevSpec[i]=v;
+  }
+  all/=(i2-i0+1);
+  lvl+=(all-lvl)*0.2;
+  lvlMax=Math.max(lvlMax*0.9995,lvl,0.03);                 // ganho automático: se adapta ao volume do ambiente
+  energy+=(Math.min(1,lvl/lvlMax)-energy)*0.05;
+  fluxHist.push(flux); if(fluxHist.length>50) fluxHist.shift();
+  const m=fluxHist.reduce((x,y)=>x+y,0)/fluxHist.length;
+  const sd=Math.sqrt(fluxHist.reduce((x,y)=>x+(y-m)*(y-m),0)/fluxHist.length);
+  const loud=lvl>0.04 && lvl>lvlMax*0.35;
+  let beat=0;
+  if(flux>m+1.3*sd && flux>0.15 && now-lastBeat>240 && loud){
+    if(lastBeat&&now-lastBeat<1200){ ibis.push(now-lastBeat); if(ibis.length>12) ibis.shift(); }
+    beat=1; lastBeat=now;
+  }else if(loud && ibis.length>=3){
+    // a música continua mas a batida ficou difícil de ouvir: segue no tempo que já aprendeu
+    let ibi=median(ibis); while(ibi<380) ibi*=2;
+    if(now-lastBeat>ibi*1.02){ beat=0.7; lastBeat=now; }
+  }
+  if(beat) beatN++;
+  return beat;
+}
+
+// 2) o iPhone pausa o áudio (tela apagou, notificação, troca de app): retoma sozinho
+let micTrack=null;
+function revive(){ if(actx&&actx.state!=='running'&&actx.state!=='closed') actx.resume().catch(()=>{}); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) revive(); });
+addEventListener('pointerdown',revive);
+setInterval(()=>{
+  if(!actx) return;
+  revive();
+  if(micTrack&&(micTrack.readyState==='ended')){
+    an=null; micTrack=null; asked=false;          // o próximo toque pede o microfone de novo
+  }
+},1000);
+
+/* ---------- carinho e susto ---------- */
+const catEl=document.getElementById('cat');
+function overCat(x,y){
+  const r=catEl.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height*0.56;
+  const dx=(x-cx)/(r.width*0.48), dy=(y-cy)/(r.height*0.46); return dx*dx+dy*dy<1;
+}
+let trail=[], petUntil=0, pet=0, down=null, scareAt=-1e9, scaredJump=false;
+addEventListener('pointermove',e=>{
+  const now=performance.now();
+  if(!overCat(e.clientX,e.clientY)||(e.pointerType!=='mouse'&&!e.buttons)){ trail=[]; return; }
+  trail.push({x:e.clientX,y:e.clientY,t:now});
+  while(trail.length&&now-trail[0].t>1000) trail.shift();
+  if(trail.length<8) return;
+  let cx=0,cy=0; for(const p of trail){cx+=p.x;cy+=p.y;} cx/=trail.length; cy/=trail.length;
+  let turn=0,len=0,rad=0,pa=null;
+  trail.forEach((p,i)=>{
+    const a=Math.atan2(p.y-cy,p.x-cx); rad+=Math.hypot(p.x-cx,p.y-cy);
+    if(pa!==null){ let d=a-pa; d=(d+3*Math.PI)%(2*Math.PI)-Math.PI; turn+=d; len+=Math.hypot(p.x-trail[i-1].x,p.y-trail[i-1].y); }
+    pa=a;
+  });
+  rad/=trail.length;
+  // girou pelo menos ~3/4 de volta, num círculo de tamanho razoável = carinho
+  if(Math.abs(turn)>Math.PI*1.5 && rad>10 && len>70) petUntil=now+600;
+});
+addEventListener('pointerdown',e=>{ if(overCat(e.clientX,e.clientY)) down={x:e.clientX,y:e.clientY,t:performance.now()}; });
+addEventListener('pointerup',e=>{
+  const now=performance.now();
+  if(down&&now-down.t<350&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<14&&overCat(e.clientX,e.clientY)){
+    scareAt=now; scaredJump=true; petUntil=0; pet=0;
+  }
+  down=null;
+});
+function scareAmt(now){ const s=(now-scareAt)/1000; if(s<0||s>1.7) return 0; if(s<0.08) return s/0.08; if(s<0.9) return 1; return 1-(s-0.9)/0.8; }
+
+let nextBlink=2, t0=performance.now(), prev=performance.now();
 function frame(now){
-  const t=(now-t0)/1000;
+  const t=(now-t0)/1000, dt=Math.min(0.05,(now-prev)/1000); prev=now;
+  // --- análise do som
+  const beat=an?hear(now):0;
+  // --- carinho / susto
+  const petting=now<petUntil;
+  pet+=((petting?1:0)-pet)*Math.min(1,dt*(petting?2.6:0.8));
+  const sc=scareAmt(now), calm=1-Math.max(pet*0.85,sc);
+  if(scaredJump){ scaredJump=false; jumpV=Math.min(jumpV,-900); }
+  // --- reação: pulo, amassadinho, orelhas, balanço alternado
+  const k=(0.55+0.45*energy)*calm;
+  if(beat){
+    jumpV=Math.min(jumpV,-(520+380*energy)*beat);
+    flick=Math.max(flick,beat); swayT=(beatN%2?1:-1)*k;
+  }
+  jumpV+=4200*dt; jumpY+=jumpV*dt;
+  if(jumpY>0){ if(jumpV>300) squash=Math.min(1,jumpV/1400); jumpY=0; jumpV=0; }
+  squash*=Math.exp(-dt*10); flick*=Math.exp(-dt*7);
+  sway+=(swayT-sway)*Math.min(1,dt*9); swayT*=Math.exp(-dt*1.2);
+
+  // --- giroscópio / dedo (continua valendo junto com a dança)
   let ix=tx,iy=ty;
-  if(performance.now()-last>2500){ ix=Math.sin(t*.7)*.1; iy=Math.sin(t*.5)*.35; if(!sensor){tx*=.98;ty*=.98;} }
+  if(performance.now()-last>2500 && !an){ ix=Math.sin(t*.7)*.1; iy=Math.sin(t*.5)*.35; if(!sensor){tx*=.98;ty*=.98;} }
   ax+=(ix-ax)*.12; ay+=(iy-ay)*.12;
   let op=1;
-  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1) nextBlink=t+2.5+Math.random()*3.5; else op=Math.max(0.06,Math.abs(1-2*p)); }
-  path.setAttribute('d',shape(ay,ax,op));
-  // um pouco de deslocamento e giro acompanhando o movimento
-  path.setAttribute('transform','translate('+(ay*28).toFixed(1)+','+(Math.sin(t*1.3)*6+ax*18).toFixed(1)+') rotate('+(ay*3).toFixed(2)+' 0 500)');
+  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1) nextBlink=t+2.5+Math.random()*3.5; else if(pet<0.3&&sc<0.05) op=Math.max(0.06,Math.abs(1-2*p)); }
+  const pe=pet*pet*(3-2*pet);
+  // susto: encara de frente; carinho: abaixa um pouco a cabeça e relaxa
+  const sv=clamp((ay+sway*0.38)*(1-sc)*(1-0.5*pe),1.12);
+  const pv=clamp((ax-flick*0.25)*(1-sc)*(1-0.6*pe)+0.22*pe-0.12*sc,1.15);
+  const ears=flick*calm-0.45*pe+0.9*sc;                       // orelhas: caem no carinho, empinam no susto
+  path.setAttribute('d',shape(sv,pv,op,ears,pe,sc));
+  const purr=pe>0.3?Math.sin(t*2*Math.PI*24)*1.6*pe:0;        // ronronar
+  const tremble=sc>0.5?Math.sin(t*2*Math.PI*17)*5*(sc-0.5):0;
+  const sx=1+0.08*squash-0.03*flick+0.035*pe-0.04*sc, sy=1-0.11*squash+0.05*flick-0.045*pe+0.06*sc;
+  path.setAttribute('transform',
+    'translate('+(sv*28+tremble).toFixed(1)+','+(Math.sin(t*1.3)*6*(1-sc)+ax*18*(1-sc)+jumpY*0.32+purr).toFixed(1)+') '+
+    'rotate('+((ay*3+sway*7)*(1-sc)*(1-0.5*pe)).toFixed(2)+' 0 1000) '+
+    'translate(0,1000) scale('+sx.toFixed(3)+','+sy.toFixed(3)+') translate(0,-1000)');
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
