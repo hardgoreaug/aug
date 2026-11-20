@@ -79,12 +79,13 @@ if(!window.isSecureContext||!navigator.mediaDevices){ hint.textContent='abra pel
 btn.addEventListener('click',async()=>{
   btn.disabled=true; btn.textContent='liberando…';
   const AC=window.AudioContext||window.webkitAudioContext;
-  actx=new AC(); actx.resume&&actx.resume();
+  if(!actx) actx=new AC(); actx.resume&&actx.resume();
   const pOri=needsPerm?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):Promise.resolve('granted');
   const pMic=navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).catch(()=>null);
   const [ori,stream]=await Promise.all([pOri,pMic]);
   if(ori==='granted') listen();
   if(stream){
+    micTrack=stream.getAudioTracks()[0];
     const src=actx.createMediaStreamSource(stream);
     an=actx.createAnalyser(); an.fftSize=2048; an.smoothingTimeConstant=0.35;
     src.connect(an); fbuf=new Uint8Array(an.frequencyBinCount);
@@ -95,29 +96,65 @@ btn.addEventListener('click',async()=>{
   }
 });
 
-const band=(lo,hi)=>{ const hz=actx.sampleRate/an.fftSize; let s=0,n=0;
-  for(let i=Math.max(1,Math.floor(lo/hz));i<=Math.ceil(hi/hz)&&i<fbuf.length;i++){s+=fbuf[i];n++;} return n?s/n/255:0; };
-let bassAvg=0.1, lvl=0, lastBeat=0, beatN=0, sway=0, swayT=0, jumpY=0, jumpV=0, squash=0, flick=0, energy=0;
+let prevSpec=null, fluxHist=[], lastBeat=0, beatN=0, ibis=[], lvl=0, lvlMax=0.05, energy=0;
+let sway=0, swayT=0, jumpY=0, jumpV=0, squash=0, flick=0;
+const median=a=>{const b=[...a].sort((x,y)=>x-y);return b[b.length>>1];};
+function hear(now){
+  an.getByteFrequencyData(fbuf);
+  const hz=actx.sampleRate/an.fftSize, i0=Math.max(1,Math.floor(35/hz)), i1=Math.ceil(180/hz), i2=Math.ceil(5000/hz);
+  // fluxo: quanto o grave SUBIU desde o quadro anterior (pega o ataque do bumbo mesmo com grave constante)
+  let flux=0, all=0;
+  if(!prevSpec) prevSpec=new Float32Array(fbuf.length);
+  for(let i=i0;i<=i2;i++){
+    const v=fbuf[i]/255; all+=v;
+    if(i<=i1){ const d=v-prevSpec[i]; if(d>0) flux+=d; }
+    prevSpec[i]=v;
+  }
+  all/=(i2-i0+1);
+  lvl+=(all-lvl)*0.2;
+  lvlMax=Math.max(lvlMax*0.9995,lvl,0.03);                 // ganho automático: se adapta ao volume do ambiente
+  energy+=(Math.min(1,lvl/lvlMax)-energy)*0.05;
+  fluxHist.push(flux); if(fluxHist.length>50) fluxHist.shift();
+  const m=fluxHist.reduce((x,y)=>x+y,0)/fluxHist.length;
+  const sd=Math.sqrt(fluxHist.reduce((x,y)=>x+(y-m)*(y-m),0)/fluxHist.length);
+  const loud=lvl>0.04 && lvl>lvlMax*0.35;
+  let beat=0;
+  if(flux>m+1.3*sd && flux>0.15 && now-lastBeat>240 && loud){
+    if(lastBeat&&now-lastBeat<1200){ ibis.push(now-lastBeat); if(ibis.length>12) ibis.shift(); }
+    beat=1; lastBeat=now;
+  }else if(loud && ibis.length>=3){
+    // a música continua mas a batida ficou difícil de ouvir: segue no tempo que já aprendeu
+    let ibi=median(ibis); while(ibi<380) ibi*=2;
+    if(now-lastBeat>ibi*1.02){ beat=0.7; lastBeat=now; }
+  }
+  if(beat) beatN++;
+  meter.style.setProperty('--l',Math.min(1,lvl/lvlMax).toFixed(2));
+  return beat;
+}
+
+// 2) o iPhone pausa o áudio (tela apagou, notificação, troca de app): retoma sozinho
+let micTrack=null;
+function revive(){ if(actx&&actx.state!=='running'&&actx.state!=='closed') actx.resume().catch(()=>{}); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) revive(); });
+addEventListener('pointerdown',revive);
+setInterval(()=>{
+  if(!actx) return;
+  revive();
+  if(micTrack&&(micTrack.readyState==='ended')){
+    an=null; meter.hidden=true; btn.hidden=false; btn.disabled=false; btn.textContent='Toque para ele voltar a ouvir';
+  }
+},1000);
 
 let nextBlink=2, t0=performance.now(), prev=performance.now();
 function frame(now){
   const t=(now-t0)/1000, dt=Math.min(0.05,(now-prev)/1000); prev=now;
   // --- análise do som
-  let beat=false;
-  if(an){
-    an.getByteFrequencyData(fbuf);
-    const bass=band(35,150), all=band(35,6000);
-    lvl+=(all-lvl)*0.15;
-    bassAvg+=(bass-bassAvg)*0.03;
-    if(bass>bassAvg*1.22 && bass>0.22 && now-lastBeat>260){ beat=true; lastBeat=now; beatN++; }
-    energy+=(Math.min(1,lvl*2.6)-energy)*0.05;     // "clima" da música: quanto mais alto, mais solto
-    meter.style.setProperty('--l',Math.min(1,lvl*3).toFixed(2));
-  }
+  const beat=an?hear(now):0;
   // --- reação: pulo, amassadinho, orelhas, balanço alternado
   const k=0.55+0.45*energy;
   if(beat){
-    jumpV=Math.min(jumpV,-(520+380*energy));
-    flick=1; swayT=(beatN%2?1:-1)*k;
+    jumpV=Math.min(jumpV,-(520+380*energy)*beat);
+    flick=Math.max(flick,beat); swayT=(beatN%2?1:-1)*k;
   }
   jumpV+=4200*dt; jumpY+=jumpV*dt;
   if(jumpY>0){ if(jumpV>300) squash=Math.min(1,jumpV/1400); jumpY=0; jumpV=0; }
