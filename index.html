@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AUG</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#f3f3f1;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  body{font-family:system-ui,-apple-system,"Helvetica Neue",sans-serif;color:#0b0b0b;touch-action:none}
+  #c{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .logo{position:fixed;left:50%;bottom:calc(16vh + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(46vw,230px);pointer-events:none}
+  .logo svg{width:100%;height:auto;display:block}
+  #hint{position:fixed;left:50%;bottom:calc(9vh + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:13px;opacity:.45;white-space:nowrap;transition:opacity .6s}
+  #go{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);border:0;background:#0b0b0b;color:#fff;font:inherit;font-weight:700;font-size:15px;padding:14px 24px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  #go[hidden]{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="logo"><svg viewBox="14 14 333 104" aria-label="AUG"><path fill="#0b0b0b" fill-rule="evenodd" d="M34.9,114.2C37.2,113.0 39.6,110.2 42.0,105.9L45.6,99.5L73.7,99.2L101.8,99.0L105.0,105.2C108.8,112.8 111.8,115.2 118.0,115.8C122.3,116.2 123.1,115.9 126.4,112.9C132.8,107.0 132.5,105.1 122.2,83.9C105.4,49.5 93.9,26.7 91.9,23.9C87.2,17.3 76.9,13.9 68.2,16.0C58.2,18.4 57.1,20.0 35.5,63.4C24.8,85.0 16.0,103.4 16.0,104.4C16.0,112.8 26.9,118.5 34.9,114.2Z M197.9,114.5C214.2,110.6 227.3,97.8 231.6,81.5C233.4,75.1 233.6,25.3 231.9,21.7C229.2,15.7 219.4,13.5 213.3,17.5C208.5,20.7 208.0,24.0 208.0,49.8C208.0,77.8 207.9,78.6 203.2,84.1C191.5,97.8 168.0,95.4 159.9,79.8C158.2,76.4 158.0,73.7 158.0,50.8C158.0,22.1 157.6,20.1 150.6,16.6C145.9,14.3 141.1,15.1 136.7,19.0L133.5,21.8L133.5,52.2L133.5,82.5L136.9,89.5C140.8,97.5 149.2,106.5 156.0,110.1C167.2,115.8 184.4,117.6 197.9,114.5Z M338.3,114.6C344.7,112.0 345.0,110.6 345.0,85.2C345.0,53.1 345.6,53.7 314.6,54.7L295.1,55.3L292.3,58.2C288.0,62.7 288.3,70.0 292.8,74.1C296.0,76.9 296.3,77.0 306.9,77.0C319.9,77.0 321.0,77.6 321.0,85.0C321.0,93.1 320.6,93.3 300.1,92.8C284.6,92.5 282.0,92.1 278.4,90.3C258.5,79.9 258.5,52.3 278.4,41.7C282.2,39.6 284.3,39.5 308.5,39.0C328.6,38.6 335.0,38.2 336.6,37.1C344.6,31.8 343.3,20.2 334.3,16.4C330.3,14.7 290.0,14.5 280.0,16.1C249.2,21.0 230.0,55.7 241.9,85.0C248.2,100.3 259.3,110.4 274.3,114.5C281.7,116.5 333.6,116.6 338.3,114.6Z M55.5,81.1C54.5,79.4 72.1,44.9 73.8,45.2C75.5,45.5 93.2,79.8 92.4,81.1C91.7,82.3 56.3,82.2 55.5,81.1Z"/></svg></div>
+<div id="hint">mexa o celular</div>
+<button id="go" hidden>Ativar movimento</button>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const HEAD="M500,282 C590,280 650,286 700,276 C735,228 760,168 790,150 C820,135 845,160 850,200 C858,260 860,320 862,360 C905,420 922,500 917,585 C907,765 722,862 500,862 C278,862 93,765 83,585 C78,500 95,420 138,360 C140,320 142,260 150,200 C155,160 180,135 210,150 C240,168 265,228 300,276 C350,286 410,280 500,282 Z";
+const EYES=[{x:380,y:585,rx:58,ry:92},{x:620,y:585,rx:58,ry:92}];
+const VB={x:40,y:100,w:920,h:800};          // área do desenho original
+
+/* ---------- 1. silhueta -> campo de distância + "pressão" (inflar) ---------- */
+const R=256;                                // resolução do raster
+const sc=R/Math.max(VB.w,VB.h);
+const cv=document.createElement('canvas'); cv.width=cv.height=R;
+const cx2=cv.getContext('2d');
+cx2.setTransform(sc,0,0,sc,-VB.x*sc+(R-VB.w*sc)/2,-VB.y*sc+(R-VB.h*sc)/2);
+cx2.fill(new Path2D(HEAD));
+const px=cx2.getImageData(0,0,R,R).data;
+const cover=new Float32Array(R*R);
+for(let i=0;i<R*R;i++) cover[i]=px[i*4+3]/255;
+
+// distância euclidiana exata (Felzenszwalb)
+function edt(f){
+  const INF=1e20,n=R,d=new Float32Array(n),v=new Int32Array(n),z=new Float32Array(n+1),g=new Float32Array(n*n);
+  const g1=new Float32Array(n);
+  const tr=(src,dst,stride,off)=>{
+    for(let q=0;q<n;q++) g1[q]=src[off+q*stride];
+    let k=0;v[0]=0;z[0]=-INF;z[1]=INF;
+    for(let q=1;q<n;q++){
+      let s=((g1[q]+q*q)-(g1[v[k]]+v[k]*v[k]))/(2*q-2*v[k]);
+      while(s<=z[k]){k--;s=((g1[q]+q*q)-(g1[v[k]]+v[k]*v[k]))/(2*q-2*v[k]);}
+      k++;v[k]=q;z[k]=s;z[k+1]=INF;
+    }
+    k=0;for(let q=0;q<n;q++){while(z[k+1]<q)k++;dst[off+q*stride]=(q-v[k])*(q-v[k])+g1[v[k]];}
+  };
+  const a=f.slice();
+  for(let x=0;x<n;x++) tr(a,a,n,x);      // colunas
+  for(let y=0;y<n;y++) tr(a,a,1,y*n);    // linhas
+  for(let i=0;i<n*n;i++) a[i]=Math.sqrt(a[i]);
+  return a;
+}
+const fin=new Float32Array(R*R), fout=new Float32Array(R*R);
+for(let i=0;i<R*R;i++){const inside=cover[i]>=.5; fin[i]=inside?1e20:0; fout[i]=inside?0:1e20;}
+const dIn=edt(fin), dOut=edt(fout);
+const sdf=new Float32Array(R*R);              // >0 dentro (em pixels do raster)
+for(let i=0;i<R*R;i++) sdf[i]= cover[i]>=.5 ? dIn[i]-.5+(cover[i]-.5) : -(dOut[i]-.5)+(cover[i]-.5);
+
+// inflar: equação de Poisson (membrana sob pressão), resolvida por SOR
+const P=new Float32Array(R*R);
+const inside=new Uint8Array(R*R); for(let i=0;i<R*R;i++) inside[i]=sdf[i]>0?1:0;
+for(let it=0;it<700;it++){
+  for(let y=1;y<R-1;y++)for(let x=1;x<R-1;x++){
+    const i=y*R+x; if(!inside[i]) continue;
+    const nb=P[i-1]+P[i+1]+P[i-R]+P[i+R];
+    P[i]+=1.92*((nb+1)/4-P[i]);
+  }
+}
+let pmax=0; for(let i=0;i<R*R;i++) if(P[i]>pmax) pmax=P[i];
+
+const samp=(F,x,y)=>{
+  x=Math.max(0,Math.min(R-1.001,x)); y=Math.max(0,Math.min(R-1.001,y));
+  const x0=x|0,y0=y|0,fx=x-x0,fy=y-y0,i=y0*R+x0;
+  return F[i]*(1-fx)*(1-fy)+F[i+1]*fx*(1-fy)+F[i+R]*(1-fx)*fy+F[i+R+1]*fx*fy;
+};
+
+/* ---------- 2. malha frente+verso com borda costurada ---------- */
+const G=220, cell=(R-1)/(G-1), thr=cell*0.35;
+const S=2.4/R;                                // escala para o mundo 3D
+const DEPTH=0.95;                             // quanto "infla"
+const idxF=new Int32Array(G*G).fill(-1), idxB=new Int32Array(G*G).fill(-1);
+const pos=[],uv=[],col=[];
+const sd=new Float32Array(G*G);
+for(let j=0;j<G;j++)for(let i=0;i<G;i++) sd[j*G+i]=samp(sdf,i*cell,j*cell);
+const isIn=k=>sd[k]>=thr;
+for(let j=0;j<G;j++)for(let i=0;i<G;i++){
+  const k=j*G+i; let x=i*cell,y=j*cell, s=sd[k];
+  if(isIn(k)){
+    const h=DEPTH*Math.pow(Math.max(0,samp(P,x,y))/pmax,0.5);
+    const X=(x-R/2)*S, Y=-(y-R/2)*S;
+    idxF[k]=pos.length/3; pos.push(X,Y,h); uv.push(x/R,1-y/R); col.push(1,1,1);
+    idxB[k]=pos.length/3; pos.push(X,Y,-h); uv.push(x/R,1-y/R); col.push(0,0,0);
+  }else{
+    let near=false;
+    for(let dj=-1;dj<=1&&!near;dj++)for(let di=-1;di<=1;di++){
+      const ii=i+di,jj=j+dj; if(ii<0||jj<0||ii>=G||jj>=G) continue;
+      if(isIn(jj*G+ii)){near=true;break;}
+    }
+    if(!near) continue;
+    // projeta o vértice para a borda exata (desliza pelo gradiente)
+    for(let n=0;n<3;n++){
+      const gx=samp(sdf,x+1,y)-samp(sdf,x-1,y), gy=samp(sdf,x,y+1)-samp(sdf,x,y-1);
+      const gl=Math.hypot(gx,gy)||1; s=samp(sdf,x,y);
+      x-=gx/gl*s; y-=gy/gl*s;
+    }
+    const X=(x-R/2)*S, Y=-(y-R/2)*S;
+    idxF[k]=idxB[k]=pos.length/3; pos.push(X,Y,0); uv.push(x/R,1-y/R); col.push(1,1,1);
+  }
+}
+const ind=[];
+const tri=(a,b,c)=>{
+  if(idxF[a]<0||idxF[b]<0||idxF[c]<0) return;
+  ind.push(idxF[a],idxF[c],idxF[b]);           // frente
+  ind.push(idxB[a],idxB[b],idxB[c]);           // verso
+};
+for(let j=0;j<G-1;j++)for(let i=0;i<G-1;i++){
+  const a=j*G+i,b=a+1,c=a+G,d=c+1;
+  tri(a,b,d); tri(a,d,c);
+}
+// suaviza a malha (tira degraus da grade) mantendo a costura da borda
+{
+  const nV=pos.length/3, rimV=new Uint8Array(nV), nb=Array.from({length:nV},()=>new Set());
+  for(let v=0;v<nV;v++) if(pos[v*3+2]===0) rimV[v]=1;
+  for(let t=0;t<ind.length;t+=3){const a=ind[t],b=ind[t+1],c=ind[t+2];nb[a].add(b).add(c);nb[b].add(a).add(c);nb[c].add(a).add(b);}
+  const nbA=nb.map(s=>[...s]);
+  const tmp=new Float32Array(pos.length);
+  const step=(lam)=>{
+    for(let v=0;v<nV;v++){
+      const n=nbA[v]; if(!n.length){tmp.set(pos.slice(v*3,v*3+3),v*3);continue;}
+      let x=0,y=0,z=0; for(const u of n){x+=pos[u*3];y+=pos[u*3+1];z+=pos[u*3+2];}
+      x/=n.length;y/=n.length;z/=n.length;
+      tmp[v*3]=pos[v*3]+lam*(x-pos[v*3]); tmp[v*3+1]=pos[v*3+1]+lam*(y-pos[v*3+1]);
+      tmp[v*3+2]=rimV[v]?0:pos[v*3+2]+lam*(z-pos[v*3+2]);
+    }
+    for(let i=0;i<pos.length;i++) pos[i]=tmp[i];
+  };
+  for(let i=0;i<8;i++){step(0.55);step(-0.57);}   // Taubin: suaviza sem encolher
+}
+const geo=new THREE.BufferGeometry();
+geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+geo.setIndex(ind);
+geo.computeVertexNormals();
+
+/* ---------- 3. cena ---------- */
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.NoToneMapping;
+renderer.toneMappingExposure=1.0;
+const scene=new THREE.Scene();
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+
+const camera=new THREE.PerspectiveCamera(30,1,0.1,50);
+camera.position.set(0,0,7.2);
+
+const rig=new THREE.Group(); rig.rotation.order='YXZ'; scene.add(rig);
+const mat=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide,vertexColors:true}); // flat, sem luz
+const body=new THREE.Mesh(geo,mat); rig.add(body);
+
+// olhos pintados na superfície (textura projetada de frente) + piscada
+const T=1024, tc=document.createElement('canvas'); tc.width=tc.height=T;
+const tx2=tc.getContext('2d');
+const k=T/R, ox=(R-VB.w*sc)/2, oy=(R-VB.h*sc)/2;
+const eyeTex=new THREE.CanvasTexture(tc); eyeTex.colorSpace=THREE.SRGBColorSpace; eyeTex.generateMipmaps=false; eyeTex.minFilter=THREE.LinearFilter;
+function paintEyes(open){
+  tx2.setTransform(1,0,0,1,0,0);
+  tx2.fillStyle='#000'; tx2.fillRect(0,0,T,T);
+  tx2.setTransform(sc*k,0,0,sc*k,(-VB.x*sc+ox)*k,(-VB.y*sc+oy)*k);
+  tx2.fillStyle='#f3f3f1';
+  for(const e of EYES){
+    tx2.beginPath();
+    if(open>0.12) tx2.ellipse(e.x,e.y+e.ry*(1-open)*0.6,e.rx,e.ry*open,0,0,Math.PI*2);
+    else { tx2.ellipse(e.x,e.y+e.ry*0.55,e.rx*1.05,9,0,0,Math.PI*2); }
+    tx2.fill();
+  }
+  eyeTex.needsUpdate=true;
+}
+paintEyes(1);
+mat.color.set(0xffffff); mat.map=eyeTex; mat.needsUpdate=true;
+
+// luzes: chave + recorte, para o brilho "de balão"
+const key=new THREE.DirectionalLight(0xffffff,2.2); key.position.set(-2.5,3,4); scene.add(key);
+const rim=new THREE.DirectionalLight(0xffffff,1.6); rim.position.set(3,1.5,-2); scene.add(rim);
+scene.add(new THREE.AmbientLight(0xffffff,.15));
+
+// sombra de contato
+const sh=document.createElement('canvas'); sh.width=sh.height=128;
+const sg=sh.getContext('2d'); const gr=sg.createRadialGradient(64,64,0,64,64,64);
+gr.addColorStop(0,'rgba(0,0,0,.35)'); gr.addColorStop(1,'rgba(0,0,0,0)'); sg.fillStyle=gr; sg.fillRect(0,0,128,128);
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.7),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sh),transparent:true,depthWrite:false}));
+shadow.position.set(0,-1.35,-.2); /* sem sombra: visual flat */
+
+function resize(){
+  const w=innerWidth,h=innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  // enquadra o gato acima do logo, cabendo na largura
+  const fit=Math.max(2.65/(2*Math.tan(THREE.MathUtils.degToRad(15))*camera.aspect), 0);
+  camera.position.z=Math.max(fit,5.4);
+  camera.setViewOffset(w,h,0,h*0.09,w,h);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize',resize); resize();
+
+/* ---------- 4. movimento: giroscópio + dedo/mouse ---------- */
+let tx=0,ty=0,ax=0,ay=0,base=null,sensor=false,last=0;
+const MAX=1.05;
+const BASE_YAW=-0.62, BASE_PITCH=0.02;
+const clamp=(v,a)=>Math.max(-a,Math.min(a,v));
+const hint=document.getElementById('hint'), btn=document.getElementById('go');
+
+function onOrient(e){
+  if(e.beta==null||e.gamma==null) return;
+  if(!sensor){sensor=true; hint.style.opacity=0;}
+  last=performance.now();
+  let b=e.beta,g=e.gamma;
+  const ang=(screen.orientation&&screen.orientation.angle)||window.orientation||0;
+  if(ang==90){[b,g]=[-g,b]} else if(ang==-90||ang==270){[b,g]=[g,-b]}
+  if(!base) base={b,g};
+  base.b+=(b-base.b)*.004; base.g+=(g-base.g)*.004;   // recentra devagar
+  ty=clamp((g-base.g)*0.035,MAX);
+  tx=clamp((b-base.b)*0.03,MAX);
+}
+function onPointer(e){
+  if(sensor) return;
+  ty=clamp((e.clientX/innerWidth-.5)*2*MAX,MAX);
+  tx=clamp((e.clientY/innerHeight-.5)*2*MAX,MAX);
+  last=performance.now();
+}
+addEventListener('pointermove',onPointer);
+addEventListener('pointerdown',onPointer);
+
+function listen(){ addEventListener('deviceorientation',onOrient,true); }
+const needsPerm=typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
+if(!window.isSecureContext){
+  hint.textContent='abra pelo link https para usar o giroscópio';
+}else if(needsPerm){
+  btn.hidden=false; hint.style.opacity=0;
+  btn.addEventListener('click',async()=>{
+    try{
+      const r=await DeviceOrientationEvent.requestPermission();
+      if(typeof DeviceMotionEvent!=='undefined'&&DeviceMotionEvent.requestPermission) DeviceMotionEvent.requestPermission().catch(()=>{});
+      if(r==='granted'){listen(); btn.hidden=true;}
+      else {btn.textContent='Permissão negada: arraste o dedo'; setTimeout(()=>btn.hidden=true,2500);}
+    }catch(err){btn.textContent='Arraste o dedo na tela'; setTimeout(()=>btn.hidden=true,2500);}
+  });
+}else listen();
+
+const clock=new THREE.Clock(); let nextBlink=2;
+renderer.setAnimationLoop(()=>{
+  const t=clock.getElapsedTime();
+  let ix=tx,iy=ty;
+  if(performance.now()-last>2500){ ix=Math.sin(t*.7)*.08; iy=Math.sin(t*.5)*.18; if(!sensor){tx*=.98;ty*=.98;} }
+  ax+=(ix-ax)*.1; ay+=(iy-ay)*.1;
+  rig.rotation.set(BASE_PITCH+ax*0.42,Math.max(-1.0,Math.min(1.0,BASE_YAW+ay)),0);
+  // piscada
+  if(t>nextBlink){ const p=(t-nextBlink)/0.18; if(p>=1){paintEyes(1);nextBlink=t+2.5+Math.random()*3.5;} else paintEyes(Math.max(0.05,Math.abs(1-2*p))); }
+  rig.position.y=Math.sin(t*1.3)*.03;              // leve flutuação de balão
+  shadow.scale.set(1-Math.abs(ay)*.25-rig.position.y*.5,1,1);
+  shadow.position.x=(BASE_YAW+ay)*.15;
+  renderer.render(scene,camera);
+});
+</script>
+</body>
+</html>
